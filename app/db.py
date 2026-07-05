@@ -1,24 +1,35 @@
 from collections.abc import AsyncGenerator
 import uuid
-
-from sqlalchemy import Column, String, Text, DateTime, ForeignKey
+from fastapi import Depends 
+from sqlalchemy import Column, String, Text, DateTime, ForeignKey, Integer, Float
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase, sessionmaker, relationship
 from datetime import datetime
+from fastpi_users.db import SQLAlchemyBaseDatabase, SQLAlchemyUserDatabaseUUID, SQLAlchemyBaseUserTableUUID
 
 class Base(DeclarativeBase):
    pass
 
 DATABASE_URL = "sqlite+aiosqlite:///.test.db"
 
+class User(SQLAlchemyBaseUserTableUUID, Base):
+   posts = relationship("Post", back_populates="user")
+
 class Post(Base):
    __tablename__ = "posts"
    id = Column(UUID(as_uuid=True), primary_key=True, default =uuid.uuid4)
+   user_id = Column(UUID(as_uuid=True), ForeignKey("user.id"), nullable=False)
    caption = Column(Text)
+   url = Column(String, nullable=True)
+   steps = Column(Integer, nullable=True)
+   distance = Column(Float, nullable=True)
+   duration = Column(Float, nullable=True)
    file_type = Column(String, nullable=False)
    file_name = Column(String, nullable=False)
    created_at = Column(DateTime, default=datetime.utcnow)
+
+   user = relationship("User", back_populates="posts")
 
 
 engine = create_async_engine(DATABASE_URL)
@@ -32,3 +43,6 @@ async def create_db_and_tables():
 async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
    async with async_session_maker() as session:
       yield session
+
+async def get_user_db(session: AsyncSession = Depends(get_async_session)):
+   yield SQLAlchemyUserDatabaseUUID(session, User)
