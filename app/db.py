@@ -2,11 +2,11 @@ from collections.abc import AsyncGenerator
 import uuid
 from fastapi import Depends 
 from sqlalchemy import Column, String, Text, DateTime, ForeignKey, Integer, Float
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import UUID
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
-from sqlalchemy.orm import DeclarativeBase, sessionmaker, relationship
+from sqlalchemy.orm import DeclarativeBase, relationship
 from datetime import datetime
-from fastpi_users.db import SQLAlchemyBaseDatabase, SQLAlchemyUserDatabaseUUID, SQLAlchemyBaseUserTableUUID
+from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTableUUID, SQLAlchemyUserDatabase
 
 class Base(DeclarativeBase):
    pass
@@ -45,4 +45,4 @@ async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
       yield session
 
 async def get_user_db(session: AsyncSession = Depends(get_async_session)):
-   yield SQLAlchemyUserDatabaseUUID(session, User)
+   yield SQLAlchemyUserDatabase(session, User)

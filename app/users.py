@@ -1,13 +1,13 @@
 import uuid
 from typing import Optional
-from fastpi import Depends, Request
-from fastapi_users import BaseUserManager, FastAPIUsers, UUIDIDMixin, models
-from fastapi_users.db.authentication import (
+from fastapi import Depends, Request
+from fastapi_users import BaseUserManager, FastAPIUsers, UUIDIDMixin
+from fastapi_users.authentication import (
     AuthenticationBackend,
     BearerTransport,
-    JWTStrategy
+    JWTStrategy,
 )
-from fastapi_users.db import SQLAlchemyUserDatabase
+from fastapi_users_db_sqlalchemy import SQLAlchemyUserDatabase
 from app.db import User, get_user_db
 
 
